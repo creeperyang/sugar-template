@@ -1,0 +1,23 @@
+{
+  "name": "sugar-template",
+  "version": "0.0.1",
+  "description": "JavaScript template engine based on mustache",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creeperyang/sugar-template.git"
+  },
+  "keywords": [
+    "template",
+    "mustache"
+  ],
+  "author": "creeperyang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/creeperyang/sugar-template/issues"
+  },
+  "homepage": "https://github.com/creeperyang/sugar-template#readme"
+}
