@@ -124,7 +124,7 @@ function parseTemplate(template, tags = sugar.tags) {
     if (openSection)
         throw new Error('Unclosed section "' + openSection[1] + '" at ' + scanner.pos)
 
-    return nestTokens(squashTokens(tokens))
+    return makeTokenTree(squashTokens(tokens))
 
     function compileTags(tagsToCompile) {
         if (typeof tagsToCompile === 'string')
@@ -190,25 +190,32 @@ function squashTokens(tokens) {
  * @param  {Array} tokens token list
  * @return {Array}        token tree
  */
-function nestTokens(tokens) {
+function makeTokenTree(tokens) {
     const nestedTokens = []
     let collector = nestedTokens
     const sections = []
 
     let token, section
     for (let i = 0, numTokens = tokens.length; i < numTokens; ++i) {
-        token = tokens[i]
-
-        switch (token[0]) {
+        let [type, value, start, end] = tokens[i]
+        token = {
+            type,
+            value,
+            loc: {
+                start,
+                end
+            }
+        }
+        switch (type) {
             case '#':
             case '^':
                 collector.push(token)
                 sections.push(token)
-                collector = token[4] = []
+                collector = token.children = []
                 break
             case '/':
                 section = sections.pop()
-                section[5] = token[2]
+                section.sectionEndLoc = token.loc
                 collector = sections.length > 0 ? sections[sections.length - 1][4] : nestedTokens
                 break
             default:

@@ -35,7 +35,7 @@ class Writer {
         for (let i = 0, numTokens = tokens.length; i < numTokens; ++i) {
             value = undefined
             token = tokens[i]
-            symbol = token[0]
+            symbol = token.type
 
             if (symbol === '#') {
                 value = this.renderSection(token, context, partials, originalTemplate)
@@ -59,36 +59,36 @@ class Writer {
         return buffer
     }
     rawValue(token) {
-        return token[1]
+        return token.value
     }
     escapedValue(token, context) {
-        const value = context.lookup(token[1])
+        const value = context.lookup(token.value)
         if (value != null)
             return escapeHtml(value)
     }
     unescapedValue(token, context) {
-        const value = context.lookup(token[1])
+        const value = context.lookup(token.value)
         if (value != null)
             return value
     }
     renderPartial(token, context, partials) {
         if (!partials) return
 
-        const value = isFunction(partials) ? partials(token[1]) : partials[token[1]]
+        const value = isFunction(partials) ? partials(token.value) : partials[token.value]
         if (value != null)
             return this.renderTokens(this.parse(value), context, partials, value)
     }
     renderInverted(token, context, partials, originalTemplate) {
-        const value = context.lookup(token[1]);
+        const value = context.lookup(token.value)
 
         // Use JavaScript's definition of falsy. Include empty arrays.
         // See https://github.com/janl/mustache.js/issues/186
         if (!value || (isArray(value) && value.length === 0))
-            return this.renderTokens(token[4], context, partials, originalTemplate);
+            return this.renderTokens(token.children, context, partials, originalTemplate)
     }
     renderSection(token, context, partials, originalTemplate) {
         let buffer = ''
-        const value = context.lookup(token[1])
+        const value = context.lookup(token.value)
 
         // This function is used to render an arbitrary template
         // in the current context by higher-order sections.
@@ -100,21 +100,21 @@ class Writer {
 
         if (isArray(value)) {
             for (let j = 0, valueLength = value.length; j < valueLength; ++j) {
-                buffer += this.renderTokens(token[4], context.push(value[j]), partials, originalTemplate)
+                buffer += this.renderTokens(token.children, context.push(value[j]), partials, originalTemplate)
             }
         } else if (typeof value === 'object' || typeof value === 'string' || typeof value === 'number') {
-            buffer += this.renderTokens(token[4], context.push(value), partials, originalTemplate)
+            buffer += this.renderTokens(token.children, context.push(value), partials, originalTemplate)
         } else if (isFunction(value)) {
             if (typeof originalTemplate !== 'string')
                 throw new Error('Cannot use higher-order sections without the original template')
 
             // Extract the portion of the original template that the section contains.
-            value = value.call(context.view, originalTemplate.slice(token[3], token[5]), subRender)
+            value = value.call(context.view, originalTemplate.slice(token.loc.end, token.sectionEndLoc.start), subRender)
 
             if (value != null)
                 buffer += value
         } else { // value is `true`
-            buffer += this.renderTokens(token[4], context, partials, originalTemplate)
+            buffer += this.renderTokens(token.children, context, partials, originalTemplate)
         }
         return buffer
     }
