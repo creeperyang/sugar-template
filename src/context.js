@@ -8,8 +8,9 @@ const {
  * maintaining a reference to the parent context.
  */
 class Context {
-    constructor(data, parentContext) {
+    constructor(data, parentContext, addtionalData) {
         this.data = data
+        this.addtionalData = addtionalData
         this.cache = {
             '.': this.data
         }
@@ -18,11 +19,12 @@ class Context {
     /**
      * Creates a new context using the given data with this context
      * as the parent.
-     * @param  {Object} data given data
-     * @return {Object}      new context object
+     * @param  {Object} data          given data
+     * @param  {Object} addtionalData addtionalData
+     * @return {Object}               new context object
      */
-    push(data) {
-        return new Context(data, this)
+    push(data, addtionalData) {
+        return new Context(data, this, addtionalData)
     }
     /**
      * Returns the value of the given name in this context, traversing
@@ -71,6 +73,10 @@ class Context {
                 if (lookupHit) break
 
                 context = context.parent
+            }
+
+            if (!lookupHit && this.addtionalData && /^\$\$([^\.\s]+)$/.test(name)) {
+                value = this.addtionalData[RegExp.$1]
             }
 
             cache[name] = value
