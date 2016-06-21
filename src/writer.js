@@ -1,14 +1,21 @@
 const {
     isFunction,
     isArray,
-    escapeHtml
+    isValue,
+    escapeHtml,
+    getValueFromString
 } = require('./utils')
 const parseTemplate = require('./parser')
 const Context = require('./context')
 
+const noop = () => ''
+
 class Writer {
     constructor() {
         this.cache = {}
+        this.helpers = {}
+        this.filters = {}
+        this.partials = {}
     }
     clearCache() {
         this.cache = {}
@@ -39,12 +46,14 @@ class Writer {
 
             if (symbol === '#') {
                 value = this.renderSection(token, context, partials, originalTemplate)
-            } else if (symbol === '^') {
-                value = this.renderInverted(token, context, partials, originalTemplate)
             } else if (symbol === '>') {
                 value = this.renderPartial(token, context, partials, originalTemplate)
             } else if (symbol === '&') {
                 value = this.unescapedValue(token, context)
+            } else if (symbol === 'filter') {
+                value = this.renderFilter(token, context)
+            } else if (symbol === 'inlineHelper') {
+                value = this.renderInlineHelper(token, context)
             } else if (symbol === 'name') {
                 value = this.escapedValue(token, context)
             } else if (symbol === 'text') {
@@ -71,52 +80,116 @@ class Writer {
         if (value != null)
             return value
     }
+    renderFilter(token, context) {
+        const data = token.context && context.lookup(token.context)
+        let value = data
+        let filter
+        token.filters.forEach((v) => {
+            filter = this.filters[v.name]
+            if (!filter) {
+                throw new Error(`Miss filter#${v.name}, at ${token.loc.start}`)
+            }
+            value = filter(value, v.hash)
+        })
+        if (value != null)
+            return escapeHtml(value)
+    }
     renderPartial(token, context, partials) {
-        if (!partials) return
-
-        const value = isFunction(partials) ? partials(token.value) : partials[token.value]
+        partials = partials || {}
+        let value = isFunction(partials) ? partials(token.value) : partials[token.value]
+        if (value == null) {
+            value = this.partials[token.value]
+        }
         if (value != null)
             return this.renderTokens(this.parse(value), context, partials, value)
     }
-    renderInverted(token, context, partials, originalTemplate) {
-        const value = context.lookup(token.value)
-
-        // Use JavaScript's definition of falsy. Include empty arrays.
-        // See https://github.com/janl/mustache.js/issues/186
-        if (!value || (isArray(value) && value.length === 0))
-            return this.renderTokens(token.children, context, partials, originalTemplate)
+    renderInlineHelper(token, context) {
+        const helper = this.helpers[token.value]
+        if (!helper) {
+            throw new Error(`Miss helper#${token.value}, at ${token.loc.start}`)
+        }
+        let data = token.params.context
+        if (data != null) {
+            data = isValue(data) ? getValueFromString(data) : context.lookup(data)
+        }
+        const value = helper.call(
+            data,
+            data,
+            {
+                fn() {
+                    return ''
+                },
+                inverse() {
+                    return ''
+                },
+                hash: token.params.hash
+            }
+        )
+        if (value != null)
+            return escapeHtml(value)
     }
     renderSection(token, context, partials, originalTemplate) {
-        let buffer = ''
-        const value = context.lookup(token.value)
-
-        // This function is used to render an arbitrary template
-        // in the current context by higher-order sections.
-        const subRender = (template) => {
-            return this.render(template, context, partials)
+        const helper = this.helpers[token.value]
+        if (!helper) {
+            throw new Error(`Miss helper#${token.value}, at ${token.loc.start}`)
         }
-
-        if (!value) return
-
-        if (isArray(value)) {
-            for (let j = 0, valueLength = value.length; j < valueLength; ++j) {
-                buffer += this.renderTokens(token.children, context.push(value[j]), partials, originalTemplate)
+        let data = token.params.context
+        if (data != null) {
+            data = isValue(data) ? getValueFromString(data) : context.lookup(data)
+        }
+        return helper.call(
+            data,
+            data,
+            {
+                fn: this._createRenderer(token.children, context, partials, originalTemplate),
+                inverse: token.inversedChildren
+                    ? this._createRenderer(token.inversedChildren, context, partials, originalTemplate)
+                    : function() {
+                        return ''
+                    },
+                hash: token.params.hash
             }
-        } else if (typeof value === 'object' || typeof value === 'string' || typeof value === 'number') {
-            buffer += this.renderTokens(token.children, context.push(value), partials, originalTemplate)
-        } else if (isFunction(value)) {
-            if (typeof originalTemplate !== 'string')
-                throw new Error('Cannot use higher-order sections without the original template')
-
-            // Extract the portion of the original template that the section contains.
-            value = value.call(context.view, originalTemplate.slice(token.loc.end, token.sectionEndLoc.start), subRender)
-
-            if (value != null)
-                buffer += value
-        } else { // value is `true`
-            buffer += this.renderTokens(token.children, context, partials, originalTemplate)
+        )
+    }
+    _createRenderer(tokens, context, partials, originalTemplate) {
+        return (ctx, pluginData) => {
+            ctx = ctx || context
+            if (!(ctx instanceof Context)) {
+                ctx = context.push(ctx, pluginData)
+            }
+            return this.renderTokens(tokens, ctx, partials, originalTemplate)
         }
-        return buffer
+    }
+
+    // add helper function
+    registerHelper(name, fn) {
+        if (!name) return
+        if (!isFunction(fn)) {
+            fn = noop
+        }
+        this.helpers[name] = fn
+    }
+    unregisterHelper(name) {
+        delete this.helpers[name]
+    }
+    // add filter function
+    registerFilter(name, fn) {
+        if (!name) return
+        if (!isFunction(fn)) {
+            fn = () => fn
+        }
+        this.filters[name] = fn
+    }
+    unregisterFilter(name) {
+        delete this.filters[name]
+    }
+    // add partials
+    registerPartial(name, template) {
+        if (!name || typeof template !== 'string') return
+        this.partials[name] = template
+    }
+    unregisterPartial(name) {
+        delete this.partials[name]
     }
 }
 
