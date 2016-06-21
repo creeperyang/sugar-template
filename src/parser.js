@@ -1,18 +1,22 @@
 const Scanner = require('./scanner')
+const Node = require('./node')
 const {
     isFunction,
     isArray,
     isWhitespace,
     escapeRegExp,
-    escapeHtml
+    escapeHtml,
+    parseParams,
+    parseFilters
 } = require('./utils')
 const sugar = require('./sugar')
 
 const whiteRe = /\s*/
+const filterRe = /\s+\|\s+/
 const spaceRe = /\s+/
 const equalsRe = /\s*=/
 const curlyRe = /\s*\}/
-const tagRe = /#|\^|\/|>|\{|&|=|!/
+const tagRe = /#|\/|>|\{|&|=|!/
 
 // core function
 function parseTemplate(template, tags = sugar.tags) {
@@ -50,7 +54,7 @@ function parseTemplate(template, tags = sugar.tags) {
                     nonSpace = true
                 }
 
-                tokens.push(['text', chr, start, ++start])
+                tokens.push(new Node('text', chr, start, ++start))
 
                 // Check for whitespace on the current line.
                 if (chr === '\n') stripSpace()
@@ -92,10 +96,12 @@ function parseTemplate(template, tags = sugar.tags) {
         if (!scanner.scan(closingTagRe))
             throw new Error('Unclosed tag at ' + scanner.pos)
 
-        token = [type, value, start, scanner.pos]
+        token = new Node(type, value, start, scanner.pos)
         tokens.push(token)
 
-        if (type === '#' || type === '^') {
+        if (type === '#') {
+            token.isHelper = true
+            handleHelperToken(token, value)
             sections.push(token)
         }
         // type: end block
@@ -106,12 +112,33 @@ function parseTemplate(template, tags = sugar.tags) {
             if (!openSection)
                 throw new Error('Unopened section "' + value + '" at ' + start)
 
-            if (openSection[1] !== value)
-                throw new Error('Unclosed section "' + openSection[1] + '" at ' + start)
+            if (openSection.value !== value)
+                throw new Error('Unclosed section "' + openSection.value + '" at ' + start)
         }
         // type: name, raw html
         else if (type === 'name' || type === '{' || type === '&') {
             nonSpace = true
+
+            /**
+             * identify special cases
+             * 1. identify filter, {{name | filter}}
+             * 2. identify inline helper, {{code name key=value}}
+             * 3. identify else block, {{else}}
+             */
+            if (value === 'else') {
+                let section = sections[sections.length - 1]
+                if (section && section.value === 'if') {
+                    nonSpace = false
+                    token.isElseBlock = true
+                }
+                // previous token.type  previousToken.elseToken ---> inverse render method
+            } else if (spaceRe.test(value)) {
+                if (filterRe.test(value)) {
+                    token.isFilter = true
+                } else {
+                    token.isInlineHelper = true
+                }
+            }
         }
         else if (type === '=') {
             // Set the tags for the next time around.
@@ -122,7 +149,7 @@ function parseTemplate(template, tags = sugar.tags) {
     // Make sure there are no open sections when we're done.
     openSection = sections.pop()
     if (openSection)
-        throw new Error('Unclosed section "' + openSection[1] + '" at ' + scanner.pos)
+        throw new Error('Unclosed section "' + openSection.value + '" at ' + scanner.pos)
 
     return makeTokenTree(squashTokens(tokens))
 
@@ -155,6 +182,17 @@ function parseTemplate(template, tags = sugar.tags) {
     }
 }
 
+function handleHelperToken(token, value) {
+    value = value || token.value
+    token.originalValue = value
+    value = value.split(spaceRe)
+    token.value = token.helper = value[0]
+    token.params = parseParams(value.slice(1))
+    if (token.type === 'name') {
+        token.type = 'inlineHelper'
+    }
+}
+
 /**
  * Combines the values of consecutive text tokens in the given `tokens` array
  * to a single token.
@@ -169,9 +207,9 @@ function squashTokens(tokens) {
         token = tokens[i]
 
         if (token) {
-            if (token[0] === 'text' && lastToken && lastToken[0] === 'text') {
-                lastToken[1] += token[1]
-                lastToken[3] = token[3]
+            if (token.type === 'text' && lastToken && lastToken.type === 'text') {
+                lastToken.value += token.value
+                lastToken.loc.end = token.loc.end
             } else {
                 squashedTokens.push(token)
                 lastToken = token
@@ -197,18 +235,9 @@ function makeTokenTree(tokens) {
 
     let token, section
     for (let i = 0, numTokens = tokens.length; i < numTokens; ++i) {
-        let [type, value, start, end] = tokens[i]
-        token = {
-            type,
-            value,
-            loc: {
-                start,
-                end
-            }
-        }
-        switch (type) {
+        token = tokens[i]
+        switch (token.type) {
             case '#':
-            case '^':
                 collector.push(token)
                 sections.push(token)
                 collector = token.children = []
@@ -216,7 +245,18 @@ function makeTokenTree(tokens) {
             case '/':
                 section = sections.pop()
                 section.sectionEndLoc = token.loc
-                collector = sections.length > 0 ? sections[sections.length - 1][4] : nestedTokens
+                collector = sections.length > 0 ? sections[sections.length - 1].children : nestedTokens
+                if (section.elseTokenPos != null) {
+                    section.inversedChildren = section.children.slice(section.elseTokenPos)
+                    section.children = section.children.slice(0, section.elseTokenPos)
+                }
+                break
+            case 'name':
+                handleSpecialNameToken(token, i)
+                if (!token.isElseBlock) {
+                    // ignore/remove `{{else}}` token
+                    collector.push(token)
+                }
                 break
             default:
                 collector.push(token)
@@ -224,6 +264,30 @@ function makeTokenTree(tokens) {
     }
 
     return nestedTokens
+
+    function handleSpecialNameToken(token, index) {
+        if (token.isElseBlock) {
+            const ifToken = sections[sections.length - 1]
+            if (!ifToken || ifToken.helper !== 'if') {
+                throw new Error('Unexpected else block')
+            }
+            ifToken.elseTokenPos = collector.length
+        } else if (token.isInlineHelper) {
+            handleHelperToken(token)
+        } else if (token.isFilter) {
+            handleFilterToken(token)
+        }
+    }
+    function handleFilterToken(token) {
+        let value = token.value
+        token.originalValue = value
+        value = value.split(filterRe)
+        token.context = value[0]
+        token.value = null
+        token.filters = parseFilters(value.slice(1))
+        token.type = 'filter'
+        console.log('filter token', token)
+    }
 }
 
 module.exports = parseTemplate
