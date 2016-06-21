@@ -241,6 +241,7 @@ function makeTokenTree(tokens) {
                 collector.push(token)
                 sections.push(token)
                 collector = token.children = []
+                section = token
                 break
             case '/':
                 section = sections.pop()
@@ -256,10 +257,12 @@ function makeTokenTree(tokens) {
                 if (!token.isElseBlock) {
                     // ignore/remove `{{else}}` token
                     collector.push(token)
+                    token.parent = section
                 }
                 break
             default:
                 collector.push(token)
+                token.parent = section
         }
     }
 
@@ -286,7 +289,6 @@ function makeTokenTree(tokens) {
         token.value = null
         token.filters = parseFilters(value.slice(1))
         token.type = 'filter'
-        console.log('filter token', token)
     }
 }
 

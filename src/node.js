@@ -11,6 +11,10 @@ class Node {
             }
         }
     }
+    toJSON() {
+        const { type, value, loc, children } = this
+        return { type, value, loc, children }
+    }
 }
 
 module.exports = Node
