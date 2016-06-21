@@ -7,6 +7,13 @@ const {
 
 const defaultWriter = new Writer()
 
+// register built-in helpers
+require('./src/helpers/if')(defaultWriter)
+require('./src/helpers/each')(defaultWriter)
+require('./src/helpers/resource')(defaultWriter)
+// register built-in filters
+require('./src/filters/stringTransform')(defaultWriter)
+
 sugar.clearCache = function clearCache() {
     return defaultWriter.clearCache()
 }
