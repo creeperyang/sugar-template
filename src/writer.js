@@ -94,9 +94,10 @@ class Writer {
             return escapeHtml(value)
     }
     renderPartial(token, context, partials) {
-        partials = partials || {}
-        let value = isFunction(partials) ? partials(token.value) : partials[token.value]
-        if (value == null) {
+        let value
+        if (partials) {
+            value = isFunction(partials) ? partials(token.value) : partials[token.value]
+        } else {
             value = this.partials[token.value]
         }
         if (value != null)
@@ -105,7 +106,7 @@ class Writer {
                 token.params.context
                     ? context.push(context.lookup(token.params.context))
                     : context,
-                partials,
+                partials || {},
                 value
             )
     }
