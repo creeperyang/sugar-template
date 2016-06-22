@@ -265,6 +265,11 @@ function makeTokenTree(tokens, parent) {
                     token.parent = parent
                 }
                 break
+            case '>':
+                handlePartialToken(token)
+                collector.push(token)
+                token.parent = parent
+                break
             default:
                 collector.push(token)
                 token.parent = parent
@@ -294,6 +299,13 @@ function makeTokenTree(tokens, parent) {
         token.value = null
         token.filters = parseFilters(value.slice(1))
         token.type = 'filter'
+    }
+    function handlePartialToken(token) {
+        let value = token.value
+        token.originalValue = value
+        value = value.split(spaceRe)
+        token.value = token.partial = value[0]
+        token.params = parseParams(value.slice(1))
     }
 }
 

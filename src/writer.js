@@ -102,7 +102,9 @@ class Writer {
         if (value != null)
             return this.renderTokens(
                 this.parse(value, undefined, token),
-                context,
+                token.params.context
+                    ? context.push(context.lookup(token.params.context))
+                    : context,
                 partials,
                 value
             )
