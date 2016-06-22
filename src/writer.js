@@ -117,7 +117,7 @@ class Writer {
             data = isValue(data) ? getValueFromString(data) : context.lookup(data)
         }
         const value = helper.call(
-            data,
+            context,
             data,
             {
                 fn() {
@@ -142,7 +142,7 @@ class Writer {
             data = isValue(data) ? getValueFromString(data) : context.lookup(data)
         }
         return helper.call(
-            data,
+            context,
             data,
             {
                 fn: this._createRenderer(token.children, context, partials, originalTemplate),
