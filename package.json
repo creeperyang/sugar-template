@@ -4,7 +4,7 @@
   "description": "JavaScript template engine based on mustache",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha test/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/creeperyang/sugar-template/issues"
   },
-  "homepage": "https://github.com/creeperyang/sugar-template#readme"
+  "homepage": "https://github.com/creeperyang/sugar-template#readme",
+  "devDependencies": {
+    "mocha": "^2.5.3",
+    "should": "^9.0.2"
+  }
 }
