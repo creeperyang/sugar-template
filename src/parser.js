@@ -129,7 +129,9 @@ function parseTemplate(template, tags = sugar.tags, parentToken) {
              */
             if (value === 'else') {
                 let section = sections[sections.length - 1]
-                if (section && section.value === 'if') {
+                if (section && (
+                    section.value === 'if' || section.value === 'unless'
+                )) {
                     nonSpace = false
                     token.isElseBlock = true
                 }
@@ -281,7 +283,9 @@ function makeTokenTree(tokens, parent) {
     function handleSpecialNameToken(token, index) {
         if (token.isElseBlock) {
             const ifToken = sections[sections.length - 1]
-            if (!ifToken || ifToken.helper !== 'if') {
+            if (!ifToken || !(
+                ifToken.helper === 'if' || ifToken.helper === 'unless'
+            )) {
                 throw new Error('Unexpected else block')
             }
             ifToken.elseTokenPos = collector.length
