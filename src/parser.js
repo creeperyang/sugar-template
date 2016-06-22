@@ -19,7 +19,7 @@ const curlyRe = /\s*\}/
 const tagRe = /#|\/|>|\{|&|=|!/
 
 // core function
-function parseTemplate(template, tags = sugar.tags) {
+function parseTemplate(template, tags = sugar.tags, parentToken) {
     if (!template) return []
 
     let sections = [] // Stack to hold section tokens
@@ -101,6 +101,8 @@ function parseTemplate(template, tags = sugar.tags) {
 
         if (type === '#') {
             token.isHelper = true
+            // we need pre handle helper here because we need helper name to
+            // check whether helper is correctly closed
             handleHelperToken(token, value)
             sections.push(token)
         }
@@ -151,7 +153,7 @@ function parseTemplate(template, tags = sugar.tags) {
     if (openSection)
         throw new Error('Unclosed section "' + openSection.value + '" at ' + scanner.pos)
 
-    return makeTokenTree(squashTokens(tokens))
+    return makeTokenTree(squashTokens(tokens), (parentToken instanceof Node) && parentToken)
 
     function compileTags(tagsToCompile) {
         if (typeof tagsToCompile === 'string')
@@ -225,10 +227,11 @@ function squashTokens(tokens) {
  * tokens that represent a section have two additional items: 1) an array of
  * all tokens that appear in that section and 2) the index in the original
  * template that represents the end of that section.
- * @param  {Array} tokens token list
- * @return {Array}        token tree
+ * @param  {Array} tokens  token list
+ * @param  {Object} parent parent token
+ * @return {Array}         token tree
  */
-function makeTokenTree(tokens) {
+function makeTokenTree(tokens, parent) {
     const nestedTokens = []
     let collector = nestedTokens
     const sections = []
@@ -241,7 +244,8 @@ function makeTokenTree(tokens) {
                 collector.push(token)
                 sections.push(token)
                 collector = token.children = []
-                section = token
+                token.parent = parent
+                parent = token
                 break
             case '/':
                 section = sections.pop()
@@ -251,18 +255,19 @@ function makeTokenTree(tokens) {
                     section.inversedChildren = section.children.slice(section.elseTokenPos)
                     section.children = section.children.slice(0, section.elseTokenPos)
                 }
+                parent = section.parent
                 break
             case 'name':
                 handleSpecialNameToken(token, i)
+                // ignore/remove `{{else}}` token
                 if (!token.isElseBlock) {
-                    // ignore/remove `{{else}}` token
                     collector.push(token)
-                    token.parent = section
+                    token.parent = parent
                 }
                 break
             default:
                 collector.push(token)
-                token.parent = section
+                token.parent = parent
         }
     }
 
