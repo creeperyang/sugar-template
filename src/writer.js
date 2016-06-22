@@ -20,14 +20,13 @@ class Writer {
     clearCache() {
         this.cache = {}
     }
-    parse(template, tags) {
+    parse(template, tags, parentToken) {
         const cache = this.cache
         let tokens = cache[template]
 
         if (tokens == null) {
-            tokens = cache[template] = parseTemplate(template, tags)
+            tokens = cache[template] = parseTemplate(template, tags, parentToken)
         }
-
         return tokens
     }
     render(template, view, partials) {
@@ -101,7 +100,12 @@ class Writer {
             value = this.partials[token.value]
         }
         if (value != null)
-            return this.renderTokens(this.parse(value), context, partials, value)
+            return this.renderTokens(
+                this.parse(value, undefined, token),
+                context,
+                partials,
+                value
+            )
     }
     renderInlineHelper(token, context) {
         const helper = this.helpers[token.value]
