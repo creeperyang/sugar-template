@@ -161,12 +161,13 @@ class Writer {
         )
     }
     _createRenderer(tokens, context, partials, originalTemplate) {
-        return (ctx, pluginData) => {
-            ctx = ctx || context
-            if (!(ctx instanceof Context)) {
-                ctx = context.push(ctx, pluginData)
+        return (subContext, pluginData) => {
+            if (!(subContext instanceof Context)) {
+                subContext = subContext === context.data
+                    ? context
+                    : context.push(subContext, pluginData)
             }
-            return this.renderTokens(tokens, ctx, partials, originalTemplate)
+            return this.renderTokens(tokens, subContext, partials, originalTemplate)
         }
     }
 
