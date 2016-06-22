@@ -116,7 +116,8 @@ class Writer {
         }
         let data = token.params.context
         if (data != null) {
-            data = isValue(data) ? getValueFromString(data) : context.lookup(data)
+            let value = isValue(data)
+            data = value ? getValueFromString(data, value.preferNumber) : context.lookup(data)
         }
         const value = helper.call(
             context,
@@ -141,7 +142,8 @@ class Writer {
         }
         let data = token.params.context
         if (data != null) {
-            data = isValue(data) ? getValueFromString(data) : context.lookup(data)
+            let value = isValue(data)
+            data = value ? getValueFromString(data, value.preferNumber) : context.lookup(data)
         }
         return helper.call(
             context,

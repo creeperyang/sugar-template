@@ -31,9 +31,13 @@ function isWhitespace(string) {
 // values, not property name
 // "string", 'string', 5, false, true, null, undefined
 function isValue(string) {
-    return typeof string === 'string'
-        ? /true|false|null|undefined|([0-9\.]+)|"[^"]*"|'[^']*'/.test(string)
-        : false
+    if (typeof string !== 'string'
+        || !/^(true|false|null|undefined|(\d+(\.\d+)?)|"[^"]*"|'[^']*')$/.test(string)) {
+            return false
+        }
+    return {
+        preferNumber: !!RegExp.$2
+    }
 }
 
 function escapeRegExp(string) {
@@ -67,7 +71,7 @@ function hasProperty(obj, propName) {
     return obj != null && typeof obj === 'object' && (propName in obj)
 }
 
-const hashStringRe = /(\S+)=(true|false|null|undefined|([0-9\.]+)|"[^"]*"|'[^']*')/
+const hashStringRe = /^(\S+)=(true|false|null|undefined|(\d+(\.\d+)?)|"[^"]*"|'[^']*')$/
 
 function parseParams(array) {
     let context, hash = {}, val
