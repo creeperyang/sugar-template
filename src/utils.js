@@ -71,37 +71,6 @@ function hasProperty(obj, propName) {
     return obj != null && typeof obj === 'object' && (propName in obj)
 }
 
-const hashStringRe = /^(\S+)=(true|false|null|undefined|(\d+(\.\d+)?)|"[^"]*"|'[^']*')$/
-
-function parseParams(array) {
-    let context, hash = {}, val
-    // if has context
-    if (!hashStringRe.test(array[0])) {
-        context = array[0]
-        array = array.slice(1)
-    }
-    array.forEach((v) => {
-        val = hashStringRe.exec(v)
-        if (val) {
-            hash[val[1]] = getValueFromString(val[2], !!val[3])
-        }
-    })
-    return {
-        context,
-        hash
-    }
-}
-
-function parseFilters(array) {
-    return array.map(v => {
-        const val = parseParams(v.split(/\s+/))
-        return {
-            name: val.context,
-            hash: val.hash
-        }
-    })
-}
-
 const stringToValueMap = {
     'null': null,
     'undefined': undefined,
@@ -138,8 +107,6 @@ exports = module.exports = {
     escapeRegExp,
     escapeHtml,
     hasProperty,
-    parseParams,
-    parseFilters,
     getValueFromString,
     SafeString
 }

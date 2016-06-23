@@ -6,8 +6,7 @@ const {
     isWhitespace,
     escapeRegExp,
     escapeHtml,
-    parseParams,
-    parseFilters
+    getValueFromString
 } = require('./utils')
 const sugar = require('./sugar')
 
@@ -186,12 +185,67 @@ function parseTemplate(template, tags = sugar.tags, parentToken) {
     }
 }
 
+const quoteRe = /"/
+const singleQuoteRe = /'/
+const argEqualsRe = /\s*=\s*/
+const allowedValueRe = /true|false|null|undefined|(\d+(\.\d+)?)/
+function parseArguments(string, onlyHash) {
+    const res = {
+        hash: {}
+    }
+    if (!string || typeof string !== 'string') return res
+    if (onlyHash === undefined) {
+        onlyHash = /^\s*[^=\s]+\s*=/.test(string)
+    }
+    const scanner = new Scanner(string)
+    scanner.scan(spaceRe)
+    while (!scanner.eos()) {
+        let value, key
+        if (onlyHash) {
+            value = scanner.scanUntil(argEqualsRe)
+            if (!value) break
+            let key = value
+            scanner.scan(argEqualsRe)
+            value = scanner.scan(allowedValueRe)
+            if (value) {
+                res.hash[key] = getValueFromString(value, !!RegExp.$1)
+            } else {
+                let quote = scanner.charAt(0)
+                let re = quote === `"`
+                    ? quoteRe
+                    : quote === `'`
+                    ? singleQuoteRe
+                    : null
+                if (!re) throw new Error('Unexpected value when parse arguments')
+                // remove left part quote
+                scanner.scan(re)
+                value = scanner.scanUntil(re)
+                let chr = scanner.charAt(1)
+
+                while (chr && !spaceRe.test(chr)) {
+                    value += scanner.scan(re) + scanner.scanUntil(re)
+                    chr = scanner.charAt(1)
+                }
+                res.hash[key] = value
+                // remove right part quote
+                scanner.scan(re)
+            }
+        } else {
+            value = scanner.scanUntil(spaceRe)
+            onlyHash = true
+            res.context = value
+        }
+        scanner.scan(spaceRe)
+    }
+    return res
+}
+
 function handleHelperToken(token, value) {
     value = value || token.value
+    let index = value.search(spaceRe)
     token.originalValue = value
-    value = value.split(spaceRe)
-    token.value = token.helper = value[0]
-    token.params = parseParams(value.slice(1))
+    token.value = token.helper = value.slice(0, index)
+    token.params = parseArguments(value.slice(index))
     if (token.type === 'name') {
         token.type = 'inlineHelper'
     }
@@ -301,16 +355,24 @@ function makeTokenTree(tokens, parent) {
         value = value.split(filterRe)
         token.context = value[0]
         token.value = null
-        token.filters = parseFilters(value.slice(1))
+        token.filters = value.slice(1).map(v => {
+            let res = parseArguments(v)
+            return {
+                name: res.context,
+                hash: res.hash
+            }
+        })
         token.type = 'filter'
     }
     function handlePartialToken(token) {
         let value = token.value
+        let index = value.search(spaceRe)
         token.originalValue = value
-        value = value.split(spaceRe)
-        token.value = token.partial = value[0]
-        token.params = parseParams(value.slice(1))
+        token.value = token.partial = value.slice(0, index)
+        token.params = parseArguments(value.slice(index))
     }
 }
 
-module.exports = parseTemplate
+exports = module.exports = parseTemplate
+// mainly export for test
+exports.parseArguments = parseArguments

@@ -58,6 +58,10 @@ class Scanner {
 
         return text
     }
+    charAt(index) {
+        if (typeof index !== 'number' || index < 0) return null
+        return this.tail.charAt(index)
+    }
 }
 
 module.exports = Scanner
