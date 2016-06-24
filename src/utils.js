@@ -30,9 +30,10 @@ function isWhitespace(string) {
 
 // values, not property name
 // "string", 'string', 5, false, true, null, undefined
+// Be tolerant of string check, if starts with "|', we think it is string
 function isValue(string) {
     if (typeof string !== 'string'
-        || !/^(true|false|null|undefined|(\d+(\.\d+)?)|"[^"]*"|'[^']*')$/.test(string)) {
+        || !/^(true|false|null|undefined|(\d+(\.\d+)?))$|^"|^'/.test(string)) {
             return false
         }
     return {
