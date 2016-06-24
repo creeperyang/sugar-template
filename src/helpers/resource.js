@@ -14,7 +14,7 @@ module.exports = function(instance) {
     instance.registerHelper('js', function(url, options) {
         let src = url
         if (!/(https?:)\/\/.test(url)/.test(url) && !isAbsolute(url)) {
-            const base = options.base || this && this.lookup('$$file')
+            const base = options.hash.base || this && this.lookup('$$file')
             if (base) {
                 src = join(base, url)
             }
@@ -25,7 +25,7 @@ module.exports = function(instance) {
     instance.registerHelper('css', function(url, options) {
         let src = url
         if (!/(https?:)\/\/.test(url)/.test(url) && !isAbsolute(url)) {
-            const base = options.base || this && this.lookup('$$file')
+            const base = options.hash.base || this && this.lookup('$$file')
             if (base) {
                 src = join(base, url)
             }
@@ -36,12 +36,12 @@ module.exports = function(instance) {
     instance.registerHelper('img', function(url, options) {
         let src = url
         if (!/(https?:)\/\/.test(url)/.test(url) && !isAbsolute(url)) {
-            const base = options.base || this && this.lookup('$$file')
+            const base = options.hash.base || this && this.lookup('$$file')
             if (base) {
                 src = join(base, url)
             }
         }
-        const alt = options.alt || ''
+        const alt = options.hash.alt || ''
 
         return new SafeString(`<img src="${src}" alt="${alt}"/>`)
     })
