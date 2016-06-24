@@ -28,12 +28,19 @@ function isWhitespace(string) {
     return !nonSpaceRe.test(string)
 }
 
-// values, not property name
-// "string", 'string', 5, false, true, null, undefined
-// Be tolerant of string check, if starts with "|', we think it is string
-function isValue(string) {
+/**
+ * check if a string can convert to raw value
+ * return {
+ *     preferNumber
+ * } if the string is literal of (number, boolean, null, undefined)
+ *     preferNumber is true if the literal is number
+ * return false otherwise
+ * @param  {String}  string the string
+ * @return {Boolean|Object}
+ */
+function isRawValue(string) {
     if (typeof string !== 'string'
-        || !/^(true|false|null|undefined|(\d+(\.\d+)?))$|^"|^'/.test(string)) {
+        || !/^(true|false|null|undefined|(\d+(\.\d+)?))$/.test(string)) {
             return false
         }
     return {
@@ -83,7 +90,7 @@ function getValueFromString(string, preferNumber) {
     if (string in stringToValueMap) {
         return stringToValueMap[string]
     }
-    return preferNumber ? Number(string) : string.slice(1, -1)
+    return preferNumber ? Number(string) : string
 }
 
 class SafeString {
@@ -104,7 +111,7 @@ exports = module.exports = {
     typeStr,
     isWhitespace,
     isEmpty,
-    isValue,
+    isRawValue,
     escapeRegExp,
     escapeHtml,
     hasProperty,

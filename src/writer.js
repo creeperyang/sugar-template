@@ -1,7 +1,7 @@
 const {
     isFunction,
     isArray,
-    isValue,
+    isRawValue,
     escapeHtml,
     getValueFromString
 } = require('./utils')
@@ -117,8 +117,8 @@ class Writer {
         }
         let data = token.params.context
         if (data != null) {
-            let value = isValue(data)
-            data = value ? getValueFromString(data, value.preferNumber) : context.lookup(data)
+            let isRaw = token.params.contextIsString || isRawValue(data)
+            data = isRaw ? getValueFromString(data, isRaw.preferNumber) : context.lookup(data)
         }
         const value = helper.call(
             context,
@@ -143,8 +143,8 @@ class Writer {
         }
         let data = token.params.context
         if (data != null) {
-            let value = isValue(data)
-            data = value ? getValueFromString(data, value.preferNumber) : context.lookup(data)
+            let isRaw = token.params.contextIsString || isRawValue(data)
+            data = isRaw ? getValueFromString(data, isRaw.preferNumber) : context.lookup(data)
         }
         return helper.call(
             context,

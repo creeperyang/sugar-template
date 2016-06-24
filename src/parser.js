@@ -210,34 +210,49 @@ function parseArguments(string, onlyHash) {
             if (value) {
                 res.hash[key] = getValueFromString(value, !!RegExp.$1)
             } else {
-                let quote = scanner.charAt(0)
-                let re = quote === `"`
-                    ? quoteRe
-                    : quote === `'`
-                    ? singleQuoteRe
-                    : null
-                if (!re) throw new Error('Unexpected value when parse arguments')
-                // remove left part quote
-                scanner.scan(re)
-                value = scanner.scanUntil(re)
-                let chr = scanner.charAt(1)
-
-                while (chr && !spaceRe.test(chr)) {
-                    value += scanner.scan(re) + scanner.scanUntil(re)
-                    chr = scanner.charAt(1)
-                }
-                res.hash[key] = value
-                // remove right part quote
-                scanner.scan(re)
+                res.hash[key] = getStringValue()
             }
         } else {
-            value = scanner.scanUntil(spaceRe)
+            let re = getQuoteRe(scanner.charAt(0))
+            if (re) {
+                value = getStringValue(re)
+                res.contextIsString = true
+            } else {
+                value = scanner.scanUntil(spaceRe)
+            }
             onlyHash = true
             res.context = value
         }
         scanner.scan(spaceRe)
     }
     return res
+
+    function getStringValue(re) {
+        let quote
+        if (!re) {
+            quote = scanner.charAt(0)
+            re = getQuoteRe(quote)
+        }
+        if (!re) throw new Error(`Expect quote but find ${quote} when parse arguments`)
+        // remove left part quote
+        scanner.scan(re)
+        let value = scanner.scanUntil(re)
+        let chr = scanner.charAt(1)
+        while (chr && !spaceRe.test(chr)) {
+            value += scanner.scan(re) + scanner.scanUntil(re)
+            chr = scanner.charAt(1)
+        }
+        // remove right part quote
+        scanner.scan(re)
+        return value
+    }
+    function getQuoteRe(quote) {
+        return quote === `"`
+            ? quoteRe
+            : quote === `'`
+            ? singleQuoteRe
+            : null
+    }
 }
 
 function handleHelperToken(token, value) {
