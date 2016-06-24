@@ -100,15 +100,21 @@ class Writer {
         } else {
             value = this.partials[token.value]
         }
-        if (value != null)
+        if (value != null) {
+            let data = token.params.context
+            if (data != null) {
+                let isRaw = token.params.contextIsString || isRawValue(data)
+                data = isRaw ? getValueFromString(data, isRaw.preferNumber) : context.lookup(data)
+            }
             return this.renderTokens(
                 this.parse(value, undefined, token),
-                token.params.context
-                    ? context.push(context.lookup(token.params.context))
+                token.params.context != null
+                    ? context.push(data)
                     : context,
                 partials || {},
                 value
             )
+        }
     }
     renderInlineHelper(token, context) {
         const helper = this.helpers[token.value]
