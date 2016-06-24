@@ -259,8 +259,15 @@ function handleHelperToken(token, value) {
     value = value || token.value
     let index = value.search(spaceRe)
     token.originalValue = value
-    token.value = token.helper = value.slice(0, index)
-    token.params = parseArguments(value.slice(index))
+    if (index > 0) {
+        token.value = token.helper = value.slice(0, index)
+        token.params = parseArguments(value.slice(index))
+    } else {
+        token.value = token.helper = value
+        token.params = {
+            hash: {}
+        }
+    }
     if (token.type === 'name') {
         token.type = 'inlineHelper'
     }
@@ -383,8 +390,15 @@ function makeTokenTree(tokens, parent) {
         let value = token.value
         let index = value.search(spaceRe)
         token.originalValue = value
-        token.value = token.partial = value.slice(0, index)
-        token.params = parseArguments(value.slice(index))
+        if (index > 0) {
+            token.value = token.partial = value.slice(0, index)
+            token.params = parseArguments(value.slice(index))
+        } else {
+            token.value = token.partial = value
+            token.params = {
+                hash: {}
+            }
+        }
     }
 }
 
