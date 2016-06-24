@@ -10,7 +10,9 @@ const defaultWriter = new Writer()
 // register built-in helpers
 require('./src/helpers/if')(defaultWriter)
 require('./src/helpers/each')(defaultWriter)
-require('./src/helpers/resource')(defaultWriter)
+if (sugar.isNode) {
+    require('./src/helpers/resource')(defaultWriter)
+}
 // register built-in filters
 require('./src/filters/stringTransform')(defaultWriter)
 

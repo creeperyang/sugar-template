@@ -1,5 +1,8 @@
+// helpers here works on server side only
+
 const {
-    isAbsolute
+    isAbsolute,
+    join
 } = require('path')
 const {
     isEmpty,
@@ -9,12 +12,37 @@ const {
 
 module.exports = function(instance) {
     instance.registerHelper('js', function(url, options) {
-        let src = ''
-        if (isAbsolute(url)) {
-            src = url
+        let src = url
+        if (!/(https?:)\/\/.test(url)/.test(url) && !isAbsolute(url)) {
+            const base = options.base || this && this.lookup('$$file')
+            if (base) {
+                src = join(base, url)
+            }
         }
-        const base = options.base || ''
 
         return new SafeString(`<script src="${src}"></script>`)
+    })
+    instance.registerHelper('css', function(url, options) {
+        let src = url
+        if (!/(https?:)\/\/.test(url)/.test(url) && !isAbsolute(url)) {
+            const base = options.base || this && this.lookup('$$file')
+            if (base) {
+                src = join(base, url)
+            }
+        }
+
+        return new SafeString(`<link rel="stylesheet" href="${src}">`)
+    })
+    instance.registerHelper('img', function(url, options) {
+        let src = url
+        if (!/(https?:)\/\/.test(url)/.test(url) && !isAbsolute(url)) {
+            const base = options.base || this && this.lookup('$$file')
+            if (base) {
+                src = join(base, url)
+            }
+        }
+        const alt = options.alt || ''
+
+        return new SafeString(`<img src="${src}" alt="${alt}"/>`)
     })
 }
