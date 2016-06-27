@@ -67,4 +67,26 @@ describe('sugar-template#helper', function() {
         })
         text.should.be.exactly(`name: Mike\nage: 18\ngender: M`)
     })
+    it('should parse registered helpers and generate code successfully!', function() {
+        sugar.registerHelper('myhelper', function(context, options) {
+            return new sugar.SafeString(
+                `<p>${options.fn(context)}</p>`
+            )
+        })
+        let text = sugar.render(`{{#myhelper name}}{{.}}{{/myhelper}}`, {
+            name: 'K'
+        })
+        text.should.be.exactly(`<p>K</p>`)
+
+        // helper name has slash
+        sugar.registerHelper('./dir/sub/helper', function(context, options) {
+            return new sugar.SafeString(
+                `<p>${options.fn(context)}</p>`
+            )
+        })
+        text = sugar.render(`{{#./dir/sub/helper name}}{{.}}{{/./dir/sub/helper}}`, {
+            name: 'K'
+        })
+        text.should.be.exactly(`<p>K</p>`)
+    })
 })
