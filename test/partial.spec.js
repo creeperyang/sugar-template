@@ -14,6 +14,13 @@ describe('sugar-template#partial', function() {
             test: '{{name}}'
         })
         text.should.be.exactly('Jack')
+
+        text = sugar.render(`{{> ./dir/sub/test }}`, {
+            name: 'Jack'
+        }, {
+            './dir/sub/test': '{{name}}'
+        })
+        text.should.be.exactly('Jack')
     })
     it('should parse registered partials and generate code successfully!', function() {
         sugar.registerPartial('test', 'just static text')
