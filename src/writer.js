@@ -11,7 +11,18 @@ const Context = require('./context')
 const noop = () => ''
 
 class Writer {
+    constructor() {}
+    parse() {
+        throw new Error('Sub class should implement #parse method.')
+    }
+    render() {
+        throw new Error('Sub class should implement #render method.')
+    }
+}
+
+class NormalWriter extends Writer {
     constructor() {
+        super()
         this.cache = {}
         this.helpers = {}
         this.filters = {}
@@ -209,4 +220,5 @@ class Writer {
     }
 }
 
-module.exports = Writer
+exports = module.exports = NormalWriter
+exports.Writer = Writer
