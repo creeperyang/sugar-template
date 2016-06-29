@@ -1,6 +1,6 @@
 {
   "name": "sugar-template",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "JavaScript template engine based on mustache",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,10 @@
   },
   "keywords": [
     "template",
-    "mustache"
+    "mustache",
+    "template engine",
+    "sugar-template",
+    "sugar"
   ],
   "author": "creeperyang",
   "license": "MIT",
