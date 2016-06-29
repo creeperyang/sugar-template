@@ -1,21 +1,21 @@
-const sugar = require('./src/sugar')
-const Writer = require('./src/writer')
+const sugar = require('./lib/sugar')
+const Writer = require('./lib/writer')
 const {
     typeStr,
     escapeHtml,
     SafeString
-} = require('./src/utils')
+} = require('./lib/utils')
 
 const defaultWriter = new Writer()
 
 // register built-in helpers
-require('./src/helpers/if')(defaultWriter)
-require('./src/helpers/each')(defaultWriter)
+require('./lib/helpers/if')(defaultWriter)
+require('./lib/helpers/each')(defaultWriter)
 if (sugar.isNode) {
-    require('./src/helpers/resource')(defaultWriter)
+    require('./lib/helpers/resource')(defaultWriter)
 }
 // register built-in filters
-require('./src/filters/stringTransform')(defaultWriter)
+require('./lib/filters/stringTransform')(defaultWriter)
 
 sugar.clearCache = function clearCache() {
     return defaultWriter.clearCache()

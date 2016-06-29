@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const should = require('should') // eslint-disable-line
-const parseTemplate = require('../src/parser')
+const parseTemplate = require('../lib/parser')
 const parseArguments = parseTemplate.parseArguments
 
 describe('sugar-template#parseArguments', function() {
