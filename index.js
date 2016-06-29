@@ -56,5 +56,7 @@ sugar.unregisterPartial = function unregisterPartial(...args) {
 
 sugar.SafeString = SafeString
 sugar.escape = escapeHtml
+sugar.Writer = Writer.Writer
+sugar.NormalWriter = Writer
 
 module.exports = sugar
