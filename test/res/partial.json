@@ -1,0 +1,92 @@
+[
+	{
+		"type": "text",
+		"value": "<ul class=\"",
+		"loc": {
+			"start": 0,
+			"end": 11
+		}
+	},
+	{
+		"type": "name",
+		"value": "title",
+		"loc": {
+			"start": 11,
+			"end": 20
+		}
+	},
+	{
+		"type": "text",
+		"value": "\">\n",
+		"loc": {
+			"start": 20,
+			"end": 23
+		}
+	},
+	{
+		"type": "helper:start",
+		"value": "each",
+		"loc": {
+			"start": 23,
+			"end": 37
+		},
+		"paramsValue": "list"
+	},
+	{
+		"type": "text",
+		"value": "    <li>",
+		"loc": {
+			"start": 38,
+			"end": 46
+		}
+	},
+	{
+		"type": "name",
+		"value": "$$index",
+		"loc": {
+			"start": 46,
+			"end": 57
+		}
+	},
+	{
+		"type": "text",
+		"value": "-",
+		"loc": {
+			"start": 57,
+			"end": 58
+		}
+	},
+	{
+		"type": "filter",
+		"value": "name",
+		"loc": {
+			"start": 58,
+			"end": 78
+		},
+		"paramsValue": "| uppercase"
+	},
+	{
+		"type": "text",
+		"value": "</li>\n",
+		"loc": {
+			"start": 78,
+			"end": 84
+		}
+	},
+	{
+		"type": "helper:end",
+		"value": "each",
+		"loc": {
+			"start": 84,
+			"end": 93
+		}
+	},
+	{
+		"type": "text",
+		"value": "</ul>",
+		"loc": {
+			"start": 94,
+			"end": 99
+		}
+	}
+]

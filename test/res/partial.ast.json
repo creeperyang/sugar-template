@@ -1,0 +1,103 @@
+{
+	"type": "Program",
+	"body": [
+		{
+			"type": "Text",
+			"value": "<ul class=\"",
+			"loc": {
+				"start": 0,
+				"end": 11
+			}
+		},
+		{
+			"type": "Value",
+			"value": "title",
+			"loc": {
+				"start": 11,
+				"end": 20
+			}
+		},
+		{
+			"type": "Text",
+			"value": "\">\n",
+			"loc": {
+				"start": 20,
+				"end": 23
+			}
+		},
+		{
+			"type": "Helper",
+			"name": "each",
+			"value": "list",
+			"params": {
+				"hash": {},
+				"context": {
+					"type": "name",
+					"value": "list"
+				}
+			},
+			"block": [
+				{
+					"type": "Text",
+					"value": "    <li>",
+					"loc": {
+						"start": 38,
+						"end": 46
+					}
+				},
+				{
+					"type": "Value",
+					"value": "$$index",
+					"loc": {
+						"start": 46,
+						"end": 57
+					}
+				},
+				{
+					"type": "Text",
+					"value": "-",
+					"loc": {
+						"start": 57,
+						"end": 58
+					}
+				},
+				{
+					"type": "Filter",
+					"name": "name",
+					"value": "| uppercase",
+					"filters": [
+						{
+							"hash": {},
+							"name": "uppercase"
+						}
+					],
+					"loc": {
+						"start": 58,
+						"end": 78
+					}
+				},
+				{
+					"type": "Text",
+					"value": "</li>\n",
+					"loc": {
+						"start": 78,
+						"end": 84
+					}
+				}
+			],
+			"inverse": [],
+			"loc": {
+				"start": 23,
+				"end": 93
+			}
+		},
+		{
+			"type": "Text",
+			"value": "</ul>",
+			"loc": {
+				"start": 94,
+				"end": 99
+			}
+		}
+	]
+}

@@ -1,0 +1,84 @@
+[
+	{
+		"type": "text",
+		"value": "<h1>",
+		"loc": {
+			"start": 0,
+			"end": 4
+		}
+	},
+	{
+		"type": "name",
+		"value": "title",
+		"loc": {
+			"start": 4,
+			"end": 13
+		}
+	},
+	{
+		"type": "text",
+		"value": "</h1>\n",
+		"loc": {
+			"start": 13,
+			"end": 19
+		}
+	},
+	{
+		"type": "helper:inline",
+		"value": "img",
+		"loc": {
+			"start": 19,
+			"end": 47
+		},
+		"paramsValue": "\"x.png\" title=\"logo\""
+	},
+	{
+		"type": "text",
+		"value": "\n",
+		"loc": {
+			"start": 47,
+			"end": 48
+		}
+	},
+	{
+		"type": "helper:start",
+		"value": "if",
+		"loc": {
+			"start": 48,
+			"end": 60
+		},
+		"paramsValue": "list"
+	},
+	{
+		"type": "partial",
+		"value": "'./partial.tpl'",
+		"loc": {
+			"start": 65,
+			"end": 86
+		}
+	},
+	{
+		"type": "helper:elseBlock",
+		"value": "else",
+		"loc": {
+			"start": 87,
+			"end": 95
+		}
+	},
+	{
+		"type": "text",
+		"value": "    sorry, no list.\n",
+		"loc": {
+			"start": 96,
+			"end": 116
+		}
+	},
+	{
+		"type": "helper:end",
+		"value": "if",
+		"loc": {
+			"start": 116,
+			"end": 123
+		}
+	}
+]

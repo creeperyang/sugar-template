@@ -1,0 +1,101 @@
+{
+	"type": "Program",
+	"body": [
+		{
+			"type": "Text",
+			"value": "<h1>",
+			"loc": {
+				"start": 0,
+				"end": 4
+			}
+		},
+		{
+			"type": "Value",
+			"value": "title",
+			"loc": {
+				"start": 4,
+				"end": 13
+			}
+		},
+		{
+			"type": "Text",
+			"value": "</h1>\n",
+			"loc": {
+				"start": 13,
+				"end": 19
+			}
+		},
+		{
+			"type": "InlineHelper",
+			"name": "img",
+			"value": "\"x.png\" title=\"logo\"",
+			"params": {
+				"hash": {
+					"title": {
+						"type": "primitive",
+						"value": "logo"
+					}
+				},
+				"context": {
+					"type": "primitive",
+					"value": "x.png"
+				}
+			},
+			"loc": {
+				"start": 19,
+				"end": 47
+			}
+		},
+		{
+			"type": "Text",
+			"value": "\n",
+			"loc": {
+				"start": 47,
+				"end": 48
+			}
+		},
+		{
+			"type": "Helper",
+			"name": "if",
+			"value": "list",
+			"params": {
+				"hash": {},
+				"context": {
+					"type": "name",
+					"value": "list"
+				}
+			},
+			"block": [
+				{
+					"type": "Partial",
+					"name": {
+						"type": "primitive",
+						"value": "./partial.tpl"
+					},
+					"params": {
+						"hash": {}
+					},
+					"value": "'./partial.tpl'",
+					"loc": {
+						"start": 65,
+						"end": 86
+					}
+				}
+			],
+			"inverse": [
+				{
+					"type": "Text",
+					"value": "    sorry, no list.\n",
+					"loc": {
+						"start": 96,
+						"end": 116
+					}
+				}
+			],
+			"loc": {
+				"start": 48,
+				"end": 123
+			}
+		}
+	]
+}
