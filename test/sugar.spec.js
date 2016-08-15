@@ -199,6 +199,14 @@ describe('sugar-template#Sugar', function() {
                 )
             ))
         })
+        it('`render` should handle compile ignore tag correctly!', function() {
+            sugar.render(`{{= {{tag}} =}}`, {}).should.be.exactly(` {{tag}} `)
+            sugar.render(`{{=
+                {{tag}}
+                =}}`, {}).should.be.exactly(`
+                {{tag}}
+                `)
+        })
         it('`render` should generate html successfully!', function() {
             const sourceContent = fs.readFileSync(
                 path.join(__dirname, './res/source.tpl'),
