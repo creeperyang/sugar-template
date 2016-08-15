@@ -12,6 +12,7 @@ describe('sugar-template#Context', function() {
     const ctx = new Context(data)
     it('`lookup` should get value correctly!', function() {
         ctx.lookup('.').should.deepEqual(data)
+        ctx.lookup('this').should.deepEqual(data)
         ctx.lookup('user.name').should.be.exactly('ABC')
         ctx.lookup('id').should.be.exactly(0)
         should(ctx.lookup('user.xyz')).be.exactly(undefined)
@@ -23,6 +24,7 @@ describe('sugar-template#Context', function() {
         }
         const subContext = ctx.push(subData)
         subContext.lookup('.').should.deepEqual(subData)
+        subContext.lookup('this').should.deepEqual(subData)
         subContext.lookup('id').should.be.exactly(1)
         subContext.lookup('user.name').should.be.exactly('ABC')
         should(subContext.lookup('user.xyz')).be.exactly(undefined)
@@ -33,6 +35,7 @@ describe('sugar-template#Context', function() {
         }
         const ctx2 = new Context(data, null, addtionalData)
         ctx2.lookup('.').should.deepEqual(data)
+        ctx2.lookup('this').should.deepEqual(data)
         ctx2.lookup('$$index').should.be.exactly(10)
     })
 })
