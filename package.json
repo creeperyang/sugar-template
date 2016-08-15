@@ -4,7 +4,8 @@
   "description": "JavaScript template engine based on mustache",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha test/*.spec.js"
+    "test": "./node_modules/.bin/mocha test/*.spec.js",
+    "lint": "./node_modules/.bin/eslint lib/**/*.js test/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/creeperyang/sugar-template#readme",
   "devDependencies": {
+    "eslint": "^3.3.0",
     "mocha": "^2.5.3",
     "should": "^9.0.2",
     "sinon": "^1.17.5"

@@ -3,21 +3,12 @@ const path = require('path')
 const sinon = require('sinon')
 const should = require('should') // eslint-disable-line
 const {
-    tokenizer,
-    parser,
-    traverser
-} = require('../lib/compiler')
-const {
     SafeString
 } = require('../lib/utils')
 const Context = require('../lib/context')
 const Sugar = require('../lib/sugar')
 
 describe('sugar-template#Sugar', function() {
-    const sourceContent = fs.readFileSync(
-        path.join(__dirname, './res/source.tpl'),
-        { encoding: 'utf8' }
-    )
     const partialContent = fs.readFileSync(
         path.join(__dirname, './res/partial.tpl'),
         { encoding: 'utf8' }
