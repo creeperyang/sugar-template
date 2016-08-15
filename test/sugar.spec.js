@@ -1,11 +1,15 @@
 const fs = require('fs')
 const path = require('path')
+const sinon = require('sinon')
 const should = require('should') // eslint-disable-line
 const {
     tokenizer,
     parser,
     traverser
 } = require('../lib/compiler')
+const {
+    SafeString
+} = require('../lib/utils')
 const Context = require('../lib/context')
 const Sugar = require('../lib/sugar')
 
@@ -98,6 +102,24 @@ describe('sugar-template#Sugar', function() {
             }).should.be.exactly('')
         })
     })
+    describe('custom helpers', function() {
+        const sugar = new Sugar()
+        function identity(context, options) {
+            return new SafeString(options.fn(this))
+        }
+        const spy = sinon.spy(identity)
+        sugar.registerHelper('identity', spy)
+        it('custom helper should work correctly!', function() {
+            sugar.render(`{{#identity true}}<{{name}}>{{/identity}}`, {
+                name: 'Yes'
+            }).should.be.exactly('<Yes>')
+            spy.args[0][0].should.be.exactly(true)
+            spy.args[0][1].should.have.properties('fn', 'inverse', 'hash')
+            spy.calledOnce.should.be.exactly(true)
+            spy.thisValues[0].should.be.instanceof(Context)
+                .and.have.property('data', { name: 'Yes' })
+        })
+    })
     describe('built-in filters', function() {
         const sugar = new Sugar()
         require('../lib/filters/string')(sugar)
@@ -141,6 +163,25 @@ describe('sugar-template#Sugar', function() {
             sugar.render(`{{. | json space=2}}`, {
                 name: 'Kate'
             }).should.be.exactly('{\n  &quot;name&quot;: &quot;Kate&quot;\n}')
+        })
+    })
+    describe('custom filters', function() {
+        const sugar = new Sugar()
+        function camel(context, hash) {
+            return new SafeString(context.replace(/-\S/g, (match) => {
+                return match.slice(1).toUpperCase()
+            }))
+        }
+        const spy = sinon.spy(camel)
+        sugar.registerFilter('camel', spy)
+        it('custom filter should work correctly!', function() {
+            sugar.render(`{{v | camel arg=m}}`, {
+                v: 'do-it-now',
+                m: '?'
+            }).should.be.exactly('doItNow')
+            spy.args[0][0].should.be.exactly('do-it-now')
+            spy.args[0][1].should.be.deepEqual({ arg: '?' })
+            spy.calledOnce.should.be.exactly(true)
         })
     })
     describe('parse and render', function() {

@@ -25,6 +25,7 @@
   "homepage": "https://github.com/creeperyang/sugar-template#readme",
   "devDependencies": {
     "mocha": "^2.5.3",
-    "should": "^9.0.2"
+    "should": "^9.0.2",
+    "sinon": "^1.17.5"
   }
 }
