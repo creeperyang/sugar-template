@@ -26,7 +26,7 @@ sugar.render(`{{#each user}}{{.}} {{/each}}`, {
 
 1. Expression, `{{varialbe}}`, starts with `{{` and ends with `}}`.
 
-2. HTML escaping. Normal expression will be automatically escaped. So, use `{{{varialbe}}}` if you don't want escaping.
+2. HTML escaping. Normal expression will be automatically escaped. So, use `{{{varialbe}}}` if you don't wanna escaping.
 
 3. Helpers. Almost like `handlebars`, `{{#helper context}} {{/helper}}`.
 
@@ -34,15 +34,17 @@ sugar.render(`{{#each user}}{{.}} {{/each}}`, {
 
 5. Filters. `{{context | filter}}`.
 
+6. Ignore Compile. `{{=text=}}`, `text` here will output without any change.
+
 ### API
 
-#### `sugar.render(String: template, Object: data, Object|Function: partials)`
+#### `sugar.render(String: template, Object: data)`
 
 Render template to string.
 
-#### `sugar.parse(String: template[, Array: tags])`
+#### `sugar.parse(String: template)`
 
-Parse template to token tree.
+Parse template to AST.
 
 ## License
 
