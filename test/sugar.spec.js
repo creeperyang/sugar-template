@@ -218,5 +218,13 @@ describe('sugar-template#Sugar', function() {
                 list: [{ name: 'K1' }, { name: 'K2' }]
             }).should.be.exactly('<h1>Hi</h1>\nIMG\n&lt;ul class&#x3D;&quot;Hi&quot;&gt;\n    &amp;lt;li&amp;gt;0-K1&amp;lt;&amp;#x2F;li&amp;gt;\n    &amp;lt;li&amp;gt;1-K2&amp;lt;&amp;#x2F;li&amp;gt;\n&lt;&#x2F;ul&gt;')
         })
+        it('`render` should set partial\'s parent token successfully!', function() {
+            sugar.cache[partialContent].should
+                .have.properties('type', 'body', 'parent')
+            sugar.cache[partialContent].parent.should.have.properties({
+                type: 'Partial',
+                value: '\'./partial.tpl\''
+            })
+        })
     })
 })
