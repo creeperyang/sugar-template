@@ -18,3 +18,5 @@ exports.Compiler = {
     traverser
 }
 exports.Util = require('./lib/utils')
+exports.Exception = require('./lib/exception')
+exports.Context = require('./lib/context')
