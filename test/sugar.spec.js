@@ -62,6 +62,10 @@ describe('sugar-template#Sugar', function() {
             sugar.render(`{{#if name}}Yes{{else}}No{{/if}}`, {
                 name: ''
             }).should.be.exactly('No')
+
+            sugar.render(`{{#if name}}<b>Yes</b>{{else}}<b>No</b>{{/if}}`, {
+                name: 'ABC'
+            }).should.be.exactly('<b>Yes</b>')
         })
         it('`unless` should work correctly!', function() {
             sugar.render(`{{#unless true}}Hi{{/unless}}`, {}).should.be.exactly('')
@@ -73,6 +77,10 @@ describe('sugar-template#Sugar', function() {
             sugar.render(`{{#unless name}}Yes{{else}}No{{/unless}}`, {
                 name: ''
             }).should.be.exactly('Yes')
+
+            sugar.render(`{{#unless name}}<b>Yes</b>{{else}}<b>No</b>{{/unless}}`, {
+                name: 'ABC'
+            }).should.be.exactly('<b>No</b>')
         })
         it('`each` should work correctly!', function() {
             sugar.render(`{{#each nums}}{{.}}{{/each}}`, {
@@ -91,6 +99,13 @@ describe('sugar-template#Sugar', function() {
             sugar.render(`{{#each nums}}{{.}}{{/each}}`, {
                 nums: {}
             }).should.be.exactly('')
+
+            sugar.render(`{{#each nums}}<span>{{.}}</span>{{/each}}`, {
+                nums: {
+                    x: 1,
+                    y: 2
+                }
+            }).should.be.exactly('<span>1</span><span>2</span>')
         })
     })
     describe('custom helpers', function() {
@@ -216,7 +231,7 @@ describe('sugar-template#Sugar', function() {
             sugar.render(sourceContent, {
                 title: 'Hi',
                 list: [{ name: 'K1' }, { name: 'K2' }]
-            }).should.be.exactly('<h1>Hi</h1>\nIMG\n&lt;ul class&#x3D;&quot;Hi&quot;&gt;\n    &amp;lt;li&amp;gt;0-K1&amp;lt;&amp;#x2F;li&amp;gt;\n    &amp;lt;li&amp;gt;1-K2&amp;lt;&amp;#x2F;li&amp;gt;\n&lt;&#x2F;ul&gt;')
+            }).should.be.exactly('<h1>Hi</h1>\nIMG\n<ul class="Hi">\n    <li>0-K1</li>\n    <li>1-K2</li>\n</ul>')
         })
         it('`render` should set partial\'s parent token successfully!', function() {
             sugar.cache[partialContent].should
