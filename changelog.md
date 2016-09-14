@@ -1,3 +1,7 @@
+### v1.0.2
+
+1. `if/unless/each` helpers won't escape html.
+
 ### v1.0.0
 
 1. remove switch tag.
