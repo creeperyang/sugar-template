@@ -1,3 +1,7 @@
+### v1.1.0
+
+1. `{{! comment}}` support comment tag.
+
 ### v1.0.2
 
 1. `if/unless/each` helpers won't escape html.
