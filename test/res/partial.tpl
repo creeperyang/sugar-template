@@ -2,4 +2,4 @@
 {{#each list}}
     <li>{{$$index}}-{{name | uppercase}}</li>
 {{/each}}
-</ul>
+</ul>{{! ingore me!}}

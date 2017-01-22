@@ -88,5 +88,13 @@
 			"start": 94,
 			"end": 99
 		}
-	}
+	},
+    {
+        "loc": {
+            "end": 115,
+            "start": 99
+        },
+        "type": "comment",
+        "value": "ingore me!"
+    }
 ]

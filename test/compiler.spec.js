@@ -103,6 +103,9 @@ describe('sugar-template#compiler', function() {
             },
             Partial(node) {
                 node.visited = 'Partial'
+            },
+            Comment(node) {
+                node.visited = 'Comment'
             }
         }
         it('should gen ast correctly!', function() {
