@@ -1,3 +1,7 @@
+### v1.1.1
+
+1. `new Context(null)` fix lookup error when context data is null.
+
 ### v1.1.0
 
 1. `{{! comment}}` support comment tag.
