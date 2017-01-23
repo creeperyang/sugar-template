@@ -38,4 +38,13 @@ describe('sugar-template#Context', function() {
         ctx2.lookup('this').should.deepEqual(data)
         ctx2.lookup('$$index').should.be.exactly(10)
     })
+    it('should not throw when data is null!', function() {
+        const addtionalData = {
+            index: 10
+        }
+        const ctx2 = new Context(null, null, addtionalData)
+        should(ctx2.lookup('.')).be.exactly(null)
+        should(ctx2.lookup('this')).be.exactly(null)
+        ctx2.lookup('$$index').should.be.exactly(10)
+    })
 })
