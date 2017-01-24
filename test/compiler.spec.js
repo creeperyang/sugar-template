@@ -65,13 +65,17 @@ describe('sugar-template#compiler', function() {
                 )
             ))
         })
-        it('should parse hash correctly!', function() {
+        it('should parse context and hash correctly!', function() {
             const ast = parser(tokenizer(
                 `{{> "t.html" title="hey"}}`
             ))
             const ast2 = parser(tokenizer(
                 `{{> "t.html" ctx title="hey" subTitle="hi"}}`
             ))
+            const ast3 = parser(tokenizer(
+                `{{ctx | upper title="hey" subTitle="hi" | lower "yes" i=0 f=true}}`
+            ))
+
             ast.body[0].params.should.deepEqual({
                 hash: {
                     title: {
@@ -96,6 +100,39 @@ describe('sugar-template#compiler', function() {
                     value: 'ctx'
                 }
             })
+            ast3.body[0].filters.should.deepEqual([
+                {
+                    context: undefined,
+                    name: 'upper',
+                    hash: {
+                        title: {
+                            type: 'primitive',
+                            value: 'hey'
+                        },
+                        subTitle: {
+                            type: 'primitive',
+                            value: 'hi'
+                        }
+                    }
+                },
+                {
+                    context: {
+                        type: 'primitive',
+                        value: 'yes'
+                    },
+                    name: 'lower',
+                    hash: {
+                        i: {
+                            type: 'primitive',
+                            value: 0
+                        },
+                        f: {
+                            type: 'primitive',
+                            value: true
+                        }
+                    }
+                }
+            ])
         })
     })
     describe('traverser', function() {
