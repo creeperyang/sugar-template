@@ -1,3 +1,8 @@
+### v1.1.2
+
+1. fix `parseFilter`.
+2. fix `parseParamsString`.
+
 ### v1.1.1
 
 1. `new Context(null)` fix lookup error when context data is null.
