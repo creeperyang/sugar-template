@@ -42,26 +42,26 @@
 	},
 	{
 		"type": "name",
-		"value": "$$index",
+		"value": "$index",
 		"loc": {
 			"start": 46,
-			"end": 57
+			"end": 56
 		}
 	},
 	{
 		"type": "text",
 		"value": "-",
 		"loc": {
-			"start": 57,
-			"end": 58
+			"start": 56,
+			"end": 57
 		}
 	},
 	{
 		"type": "filter",
 		"value": "name",
 		"loc": {
-			"start": 58,
-			"end": 78
+			"start": 57,
+			"end": 77
 		},
 		"paramsValue": "| uppercase"
 	},
@@ -69,32 +69,32 @@
 		"type": "text",
 		"value": "</li>\n",
 		"loc": {
-			"start": 78,
-			"end": 84
+			"start": 77,
+			"end": 83
 		}
 	},
 	{
 		"type": "helper:end",
 		"value": "each",
 		"loc": {
-			"start": 84,
-			"end": 93
+			"start": 83,
+			"end": 92
 		}
 	},
 	{
 		"type": "text",
 		"value": "</ul>",
 		"loc": {
-			"start": 94,
-			"end": 99
+			"start": 93,
+			"end": 98
 		}
 	},
-    {
-        "loc": {
-            "end": 115,
-            "start": 99
-        },
-        "type": "comment",
-        "value": "ingore me!"
-    }
+	{
+		"type": "comment",
+		"value": "ingore me!",
+		"loc": {
+			"start": 98,
+			"end": 114
+		}
+	}
 ]
