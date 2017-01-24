@@ -1,3 +1,8 @@
+### v2.0.0
+
+1. update `Context` constructor, support specify dot `{{.}}` value.
+2. change meta data access: `{{$$prop}}` --> `{{$prop}}`.
+
 ### v1.1.2
 
 1. fix `parseFilter`.
