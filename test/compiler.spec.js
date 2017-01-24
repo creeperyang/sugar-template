@@ -65,6 +65,38 @@ describe('sugar-template#compiler', function() {
                 )
             ))
         })
+        it('should parse hash correctly!', function() {
+            const ast = parser(tokenizer(
+                `{{> "t.html" title="hey"}}`
+            ))
+            const ast2 = parser(tokenizer(
+                `{{> "t.html" ctx title="hey" subTitle="hi"}}`
+            ))
+            ast.body[0].params.should.deepEqual({
+                hash: {
+                    title: {
+                        type: 'primitive',
+                        value: 'hey'
+                    }
+                }
+            })
+            ast2.body[0].params.should.deepEqual({
+                hash: {
+                    title: {
+                        type: 'primitive',
+                        value: 'hey'
+                    },
+                    subTitle: {
+                        type: 'primitive',
+                        value: 'hi'
+                    }
+                },
+                context: {
+                    type: 'name',
+                    value: 'ctx'
+                }
+            })
+        })
     })
     describe('traverser', function() {
         const addFlag = (ast) => {
