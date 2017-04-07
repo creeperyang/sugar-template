@@ -134,6 +134,17 @@ describe('sugar-template#compiler', function() {
                 }
             ])
         })
+        it('should handle boundary cases correctly!', function() {
+            const ast = parser(tokenizer(`{{>./tmp.tpl}}`))
+            ast.body[0].should.containDeep({
+                type: 'Partial',
+                name: {
+                    type: 'name',
+                    value: './tmp.tpl'
+                },
+                value: './tmp.tpl'
+            })
+        })
     })
     describe('traverser', function() {
         const addFlag = (ast) => {
