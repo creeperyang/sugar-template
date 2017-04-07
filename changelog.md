@@ -1,3 +1,7 @@
+### v2.0.1
+
+1. See <https://github.com/creeperyang/sugar-template/issues/11>
+
 ### v2.0.0
 
 1. update `Context` constructor, support specify dot `{{.}}` value.
